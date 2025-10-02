@@ -1,16 +1,20 @@
 # Backend Dockerfile
 FROM node:20-alpine AS deps
-WORKDIR /app
-COPY package.json tsconfig.json ./
-COPY ../tsconfig.base.json /app/tsconfig.base.json
-COPY src ./src
-RUN npm ci || npm install
-RUN npx tsc -p tsconfig.json
+WORKDIR /repo
+COPY package.json tsconfig.base.json ./
+COPY backend/package.json backend/tsconfig.json backend/ ./backend/
+COPY shared/package.json ./shared/package.json
+RUN npm ci --ignore-scripts || npm install
+
+FROM node:20-alpine AS build
+WORKDIR /repo
+COPY --from=deps /repo/ /repo/
+RUN npm run -w shared build && npm run -w backend build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=deps /app/dist ./dist
-COPY package.json ./package.json
+COPY --from=build /repo/backend/dist ./dist
+COPY backend/package.json ./package.json
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
