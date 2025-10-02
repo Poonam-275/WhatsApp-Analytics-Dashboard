@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: whatsapp-analytics-backend
+    env: node
+    plan: starter
+    region: oregon
+    buildCommand: npm install && npm run -w shared build && npm run -w backend build
+    startCommand: node backend/dist/main.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: BACKEND_PORT
+        value: 3000
+      - key: DB_HOST
+        fromService: whatsapp-analytics-db
+        name: db
+      - key: DB_PORT
+        value: 5432
+      - key: DB_USER
+        value: postgres
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: whatsapp_analytics
+      - key: REDIS_HOST
+        fromService: whatsapp-analytics-redis
+        name: redis
+      - key: REDIS_PORT
+        value: 6379
+    healthCheckPath: /health
+  - type: pserv
+    name: whatsapp-analytics-redis
+    env: docker
+    dockerfilePath: redis:7-alpine
+  - type: pserv
+    name: whatsapp-analytics-db
+    env: docker
+    dockerfilePath: postgres:16-alpine
