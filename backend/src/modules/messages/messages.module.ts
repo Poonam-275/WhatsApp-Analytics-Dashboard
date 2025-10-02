@@ -5,10 +5,11 @@ import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
 import { BullModule } from '@nestjs/bull';
 import { MessagesQueueProcessor } from './messages.queue';
+import { WhatsAppMockService } from './whatsapp.mock';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Message]), BullModule.registerQueue({ name: 'messages' })],
-  providers: [MessagesService, MessagesQueueProcessor],
+  providers: [MessagesService, MessagesQueueProcessor, WhatsAppMockService],
   controllers: [MessagesController],
   exports: [MessagesService],
 })

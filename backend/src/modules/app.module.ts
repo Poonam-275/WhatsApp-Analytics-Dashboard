@@ -14,6 +14,9 @@ import { User } from '../entities/user.entity';
 import { Message } from '../entities/message.entity';
 import { Campaign } from '../entities/campaign.entity';
 import { Reply } from '../entities/reply.entity';
+import { Analytics } from '../entities/analytics.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from '../modules/auth/roles.guard';
 
 const env = loadEnv();
 
@@ -31,7 +34,7 @@ const env = loadEnv();
       username: env.database.user,
       password: env.database.password,
       database: env.database.name,
-      entities: [User, Message, Campaign, Reply],
+      entities: [User, Message, Campaign, Reply, Analytics],
       synchronize: false,
       migrations: ['dist/database/migrations/*.js'],
       migrationsRun: false,
@@ -50,6 +53,8 @@ const env = loadEnv();
     WebsocketModule,
   ],
   controllers: [HealthController],
-  providers: [],
+  providers: [
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
 export class AppModule {}
