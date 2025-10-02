@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  backend:
+    build: ./backend
+    container_name: whatsapp-analytics-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_PORT=3000
+      - BACKEND_LOG_LEVEL=debug
+      - WHATSAPP_API_BASE_URL=${WHATSAPP_API_BASE_URL}
+      - WHATSAPP_API_TOKEN=${WHATSAPP_API_TOKEN}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
+
+  frontend:
+    build: ./frontend
+    container_name: whatsapp-analytics-frontend
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_BASE_URL=http://backend:3000
+    depends_on:
+      - backend
